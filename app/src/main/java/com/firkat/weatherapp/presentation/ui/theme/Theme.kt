@@ -1,4 +1,4 @@
-package com.firkat.weatherapp.ui.theme
+package com.firkat.weatherapp.presentation.ui.theme
 
 import android.app.Activity
 import android.os.Build
