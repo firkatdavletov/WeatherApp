@@ -1,5 +1,6 @@
 package com.firkat.weatherapp.presentation.details
 
+import android.util.Log
 import com.arkivanov.mvikotlin.core.store.Reducer
 import com.arkivanov.mvikotlin.core.store.Store
 import com.arkivanov.mvikotlin.core.store.StoreFactory
@@ -13,7 +14,9 @@ import com.firkat.weatherapp.domain.usecase.ObserveFavouriteStateUseCase
 import com.firkat.weatherapp.presentation.details.DetailsStore.Intent
 import com.firkat.weatherapp.presentation.details.DetailsStore.Label
 import com.firkat.weatherapp.presentation.details.DetailsStore.State
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 interface DetailsStore : Store<Intent, State, Label> {
@@ -27,7 +30,7 @@ interface DetailsStore : Store<Intent, State, Label> {
     data class State(
         val city: City,
         val isFavourite: Boolean,
-        val state: ForecastState
+        val forecastState: ForecastState
     ) {
         sealed interface ForecastState {
             data object Initial: ForecastState
@@ -58,7 +61,7 @@ class DetailsStoreFactory @Inject constructor(
             initialState = State(
                 city = city,
                 isFavourite = false,
-                state = State.ForecastState.Initial
+                forecastState = State.ForecastState.Initial
             ),
             bootstrapper = BootstrapperImpl(city),
             executorFactory = ::ExecutorImpl,
@@ -110,11 +113,14 @@ class DetailsStoreFactory @Inject constructor(
 
                 Intent.ClickChangeFavouriteStatus -> {
                     scope.launch {
-                        val state = getState()
-                        if (state.isFavourite) {
-                            changeFavouriteStateUseCase.removeFromFavourite(state.city.id)
-                        } else {
-                            changeFavouriteStateUseCase.addToFavourite(state.city)
+                        withContext(Dispatchers.IO) {
+                            Log.d("DetailsStore", "Coroutine scope: ${this.coroutineContext}")
+                            val state = getState()
+                            if (state.isFavourite) {
+                                changeFavouriteStateUseCase.removeFromFavourite(state.city.id)
+                            } else {
+                                changeFavouriteStateUseCase.addToFavourite(state.city)
+                            }
                         }
                     }
                 }
@@ -145,13 +151,13 @@ class DetailsStoreFactory @Inject constructor(
                 copy(isFavourite = msg.isFavourite)
             }
             is Msg.ForecastLoaded -> {
-                copy(state = State.ForecastState.Loaded(msg.forecast))
+                copy(forecastState = State.ForecastState.Loaded(msg.forecast))
             }
             Msg.ForecastLoadingError -> {
-                copy(state = State.ForecastState.Error)
+                copy(forecastState = State.ForecastState.Error)
             }
             Msg.ForecastStartLoading -> {
-                copy(state = State.ForecastState.Loading)
+                copy(forecastState = State.ForecastState.Loading)
             }
         }
     }

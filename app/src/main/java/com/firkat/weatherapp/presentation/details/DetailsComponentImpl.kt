@@ -9,9 +9,9 @@ import com.firkat.weatherapp.presentation.extensions.componentScope
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
-import javax.inject.Inject
 
 class DetailsComponentImpl @AssistedInject constructor(
     private val factory: DetailsStoreFactory,
@@ -33,6 +33,7 @@ class DetailsComponentImpl @AssistedInject constructor(
             }
         }
     }
+    @OptIn(ExperimentalCoroutinesApi::class)
     override val model: StateFlow<DetailsStore.State> = store.stateFlow
 
     override fun onClickBack() {

@@ -11,8 +11,10 @@ import com.firkat.weatherapp.domain.usecase.SearchCityUseCase
 import com.firkat.weatherapp.presentation.search.SearchStore.Intent
 import com.firkat.weatherapp.presentation.search.SearchStore.Label
 import com.firkat.weatherapp.presentation.search.SearchStore.State
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 interface SearchStore : Store<Intent, State, Label> {
@@ -92,8 +94,12 @@ class SearchStoreFactory @Inject constructor(
                     when (openReason) {
                         OpenReason.AddToFavourite -> {
                             scope.launch {
-                                changeFavouriteStateUseCase.addToFavourite(intent.city)
-                                publish(Label.SavedToFavourite)
+                                withContext(Dispatchers.IO) {
+                                    changeFavouriteStateUseCase.addToFavourite(intent.city)
+                                }
+                                withContext(Dispatchers.Main) {
+                                    publish(Label.SavedToFavourite)
+                                }
                             }
                         }
                         OpenReason.RegularSearch -> {
