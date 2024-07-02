@@ -2,7 +2,6 @@ package com.firkat.weatherapp.data.network.api
 
 import com.firkat.weatherapp.BuildConfig
 import okhttp3.OkHttpClient
-import okhttp3.internal.tls.OkHostnameVerifier
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import retrofit2.create
