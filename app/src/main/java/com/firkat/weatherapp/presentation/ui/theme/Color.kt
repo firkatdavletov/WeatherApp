@@ -1,4 +1,4 @@
-package com.firkat.weatherapp.ui.theme
+package com.firkat.weatherapp.presentation.ui.theme
 
 import androidx.compose.ui.graphics.Color
 
